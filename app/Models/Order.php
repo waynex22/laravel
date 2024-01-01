@@ -26,4 +26,8 @@ class Order extends Model
     {
         return $this->whereUserId($userId)->latest('id')->paginate(10);
     }
+    public function getAllOrdersForAdmin()
+    {
+        return $this->latest('id')->paginate(10);
+    }
 }

@@ -58,7 +58,6 @@
                 </a>
             </li>
             @endcan
-
             @can('show-coupon')
                 <li class="nav-item">
                     <a class="nav-link text-white {{request()->routeIs('coupons.*') ? 'active bg-gradient-primary' :''}}" href="{{route('coupons.index')}}">
@@ -70,7 +69,7 @@
                 </li>
             @endcan
 
-            {{-- @can('list-order') --}}
+           @hasrole('admin')
             <li class="nav-item">
                 <a class="nav-link text-white {{request()->routeIs('admin.orders.*') ? 'active bg-gradient-primary' :''}}" href="{{route('admin.orders.index')}}">
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
@@ -79,9 +78,7 @@
                     <span class="nav-link-text ms-1">Đơn hàng</span>
                 </a>
             </li>
-            {{-- @endcan --}}
-            
-           
+            @endhasrole
         </ul>
     </div>
 </aside>

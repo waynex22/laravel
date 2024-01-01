@@ -134,11 +134,12 @@
         $(function(){
 
             getTotalValue();
-            function getTotalValue(){
-                let total = $('.total-price').data('price')
-                let couponPrice = $('.coupon-div')?.data('price') ?? 0;
-                $('.total-price-all').text(`${total - couponPrice} VNĐ`)
-            }
+            function getTotalValue() {
+    // console.log('called');
+    let total = parseFloat($('.total-price').text().replace('$', '')) || 0;
+    let couponPrice = parseFloat($('.coupon-div')?.data('price')) || 0;
+    $('.total-price-all').text(`${total - couponPrice} VNĐ`);
+}
 
             $(document).on("click", ".btn-remove-product", function (e) {
                 let url = $(this).data("action");
@@ -158,11 +159,7 @@
                     .catch(function () {});
             });
 
-
-
-
-
-            const TIME_TO_UPDATE = 1000;
+            const TIME_TO_UPDATE = 500;
             $(document).on('click', '.btn-update-quantity', _.debounce(function(e){
                 let url = $(this).data('action')
                 let id = $(this).data('id')
@@ -180,20 +177,19 @@
                     else{
                         $(`#cartProductPrice${cartProductId}`).html(`$${res.cart_product_price}`);
                     }
-                    getTotalValue();
                     $('.total-price').text(`$${cart.total_price}`);
-
-
+                    getTotalValue();
                     Swal.fire({
                         position: "top-end",
                         icon: "success",
                         title: "Tăng số lượng thành công",
                         showConfirmButton: false,
-                        timer: 1500,
+                        timer: 1000,
                     });
                 });
             }, TIME_TO_UPDATE))
         });
+       
       </script>
       {{-- <script src="{{ asset('client/cart/cart.js') }}"></script> --}}
   @endsection

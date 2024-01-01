@@ -1,6 +1,5 @@
 (function ($) {
     "use strict";
-    
     // Dropdown on mouse hover
     $(document).ready(function () {
         function toggleNavbarMethod() {
@@ -103,7 +102,7 @@
 })(jQuery);
 
 // search
-$.noConflict();
+
 jQuery(document).ready(function($) {
     var typingTimer;
     var searchForm = $('#searchForm');
@@ -156,4 +155,30 @@ jQuery(document).ready(function($) {
             hideSearchResults();
         }
     });
+});
+//sort by price
+$(document).ready(function () {
+    var products = $('#productList').children();
+
+    $('#priceFilterForm input[type="checkbox"]').change(function () {
+        filterProducts();
+    });
+
+    function filterProducts() {
+        var filteredProducts = products.filter(function () {
+            var price = parseFloat($(this).data('price'));
+
+            if ($('#price-all').is(':checked')) {
+                return true;
+            } else if ($('#price-1').is(':checked') && price > 100000) {
+                return true;
+            } else if ($('#price-2').is(':checked') && price < 100000) {
+                return true;
+            }
+
+            return false;
+        });
+        products.hide();
+        filteredProducts.show();
+    }
 });

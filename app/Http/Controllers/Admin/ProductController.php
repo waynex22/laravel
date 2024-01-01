@@ -118,5 +118,14 @@ class ProductController extends Controller
         $this->product->deleteImage($imageName);
         return redirect()->route('products.index')->with(['message' => 'Xóa thành công']);
     }
-
+    public function find(Request $request)
+    {
+        $query = $request->input('q');
+        if (!empty($query)) {
+            $results = Product::where('name', 'like', '%' . $query . '%')->get();
+            return response()->json($results);
+        } else {
+            return response()->json([]);
+        }
+    }
 }

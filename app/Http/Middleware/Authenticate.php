@@ -22,10 +22,10 @@ class Authenticate extends Middleware
         $this->authenticate($request, $guards);
 
         // Check if the user has the 'admin' role
-        if ($request->user() && $request->user()->hasRole('admin')) {
+        if ($request->user() && $request->user()) {
             return $next($request);
         }
-
+        
         return redirect()->guest(route('client.home'));
     }
 

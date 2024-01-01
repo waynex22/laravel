@@ -63,6 +63,11 @@ class User extends Authenticatable
     {
         return $this->role->name === $roleName;
     }
+    public function hasAnyRole($roleName)
+    {
+        return $this->role()->whereIn('name', $roleName)->count() > 0;
+    }
+
     // public function getImagePathAttribute(){
     //     return asset($this->images->count() > 0 ? 'upload/' . $this->images->first()->url : 'upload/defaultuser.png');
     // }

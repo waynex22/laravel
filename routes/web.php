@@ -32,7 +32,7 @@ Route::get('/', [HomeController::class, 'index'])->name('client.home');
 Route::get('product/{category_id}', [ClientProductController::class, 'index'])->name('client.products.index');
 Route::get('product-detail/{id}', [ClientProductController::class, 'show'])->name('client.products.show');
 Route::get('search', [ClientProductController::class, 'search']);
-Route::middleware('auth')->group(function(){
+Route::middleware(['auth'])->group(function(){
     Route::post('add-to-cart',[CartController::class, 'store'])->name('client.carts.add');
     Route::get('carts', [CartController::class, 'index'])->name('client.carts.index');
     Route::post('update-quantity-product-in-cart/{cart_product_id}', [CartController::class, 'updateQuantityProduct'])->name('client.carts.update_product_quantity');
@@ -47,11 +47,10 @@ Route::middleware('auth')->group(function(){
 
 
 Auth::routes();
-
-// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 //ADMIN
-Route::middleware('auth')->group(function(){
+Route::middleware(['auth', 'checkRole:admin,employee'])->group(function(){
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('roles', RoleController::class);
     Route::resource('users', UserController::class);
@@ -60,19 +59,21 @@ Route::middleware('auth')->group(function(){
     Route::resource('coupons', CouponController::class);
 
     //Vai trò
-    Route::prefix('roles')->controller(RoleController::class)->name('roles.')->group(function () {
-        Route::get('/', 'index')->name('index')->middleware('role:admin');
-        Route::post('/', 'store')->name('store')->middleware('role:admin');
-        Route::get('/create', 'create')->name('create')->middleware('role:admin');
-        Route::get('/{coupon}', 'show')->name('show')->middleware('role:admin');
-        Route::put('/{coupon}', 'update')->name('update')->middleware('role:admin');
-        Route::delete('/{coupon}', 'destroy')->name('destroy')->middleware('role:admin');
-        Route::get('/{coupon}/edit', 'edit')->name('edit')->middleware('role:admin');
+    Route::prefix('roles')->controller(RoleController::class)->name('roles.')->middleware('can:admin')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::get('/create', 'create')->name('create');
+        Route::get('/{coupon}', 'show')->name('show');
+        Route::put('/{coupon}', 'update')->name('update');
+        Route::delete('/{coupon}', 'destroy')->name('destroy');
+        Route::get('/{coupon}/edit', 'edit')->name('edit');
     });
+    
 
     //Sản phẩm
     Route::prefix('products')->controller(ProductController::class)->name('products.')->group(function () {
-        Route::get('/', 'index')->name('index')->middleware('permission:show-product');
+        Route::get('/', 'index')->name('index');
+        Route::get('/find')->name('find')->middleware('permission:find');
         Route::post('/', 'store')->name('store')->middleware('permission:create-product');
         Route::get('/create', 'create')->name('create')->middleware('permission:create-product');
         Route::get('/{coupon}', 'show')->name('show')->middleware('permission:show-product');
@@ -118,7 +119,7 @@ Route::middleware('auth')->group(function(){
 
     Route::get('orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
     // Route::get('orders', [AdminOrderController::class, 'index'])->name('admin.orders.index')->middleware('list-order');
-    // Route::post('update-status/{id}', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.update_status')->middleware('list-order');
+    Route::post('update-status/{id}', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.update_status')->middleware('list-order');
     Route::post('update-status/{id}', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.update_status');
 
 

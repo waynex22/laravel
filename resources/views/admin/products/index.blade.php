@@ -55,8 +55,20 @@
     {{-- <h1>
         Danh sách sản phẩm
     </h1> --}}
-    <div>
+    <div class="d-flex justify-content-between align-items-center">
         <a href="{{route('products.create')}}" class="btn btn-primary mt-3">Tạo mới</a>
+        <div class="col-lg-6 col-2 text-left position-relative">
+            <form id="searchForm">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control" placeholder="Tìm kiếm sản phẩm">
+                    <div class="input-group-append">
+                        <span class="input-group-text bg-transparent text-primary" id="searchButton">
+                        </span>
+                    </div>
+                </div>
+            </form>
+            <div class="position-absolute pt-2 mb-2 z-index-3 bg-body rounded " id="searchResults"></div>
+        </div>
     </div>
     <div>
         <table class="table table-hover">
@@ -98,4 +110,60 @@
         {{$products->links()}}
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    jQuery(document).ready(function($) {
+    var typingTimer;
+    var searchForm = $('#searchForm');
+    var searchResults = $('#searchResults');
+    var doneTypingInterval = 500;
+    $('input[name="q"]').on('keyup', function () {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(performSearch, doneTypingInterval);
+    });
+    $('input[name="q"]').on('keydown', function () {
+        clearTimeout(typingTimer);
+    });
+    function hideSearchResults() {
+        searchResults.empty().hide();
+    }
+    function performSearch() {
+        var query = $('input[name="q"]').val();
+        var csrfToken = $('meta[name="csrf-token"]').attr('content');
+        $.ajax({
+            type: 'GET',
+            url: '/search',
+            data: { q: query, _token: csrfToken },
+            success: function (data) {
+                searchResults.empty();
+                if (data.length > 0) {
+                    console.log(data);
+                    data.forEach(function (result) {
+                        var listItem = $('<div class=" w-100 shadow-lg p-2 mb-2 bg-primary text-white rounded cursor-pointer top-0 start-50 translate-middle-x">')
+                                        .text(result.name)
+                                        .attr('data-id', result.id)
+                                        searchResults.append(listItem);
+                    });
+                    searchResults.on('click', 'div', function () {
+                        var productId = $(this).attr('data-id');
+                        window.location.href = '/products/' + productId + '/edit'  ;
+                    });
+                    searchResults.show();
+                } else {
+                    searchResults.append('<p class="w-100 shadow-lg p-3 mb-5 bg-body rounded cursor-pointer translate-middle-x">Không tìm thấy sản phẩm nào!!</p>');
+                }
+            },
+            error: function (error) {
+                console.log('Error:', error);
+            }
+        });
+    }
+    $(document).on('click', function (event) {
+        if (!searchForm.is(event.target) && searchForm.has(event.target).length === 0 &&
+            !searchResults.is(event.target) && searchResults.has(event.target).length === 0) {
+            hideSearchResults();
+        }
+    });
+});
+</script>
 @endsection
